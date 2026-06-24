@@ -1,0 +1,315 @@
+!@CoreTaas
+
+conf t
+ int fa0/9
+ no sw
+ ip add 192.168.147.161 255.255.255.224
+ no shut
+ end
+ 
+!@CoreBaba
+
+conf t
+ int fa0/9
+ no sw
+ ip add 192.168.147.200 255.255.255.224
+ no shut
+ end
+
+
+
+
+_	
+https://msp.rivannoc.com/otrs/index.pl
+admin
+C1sc0123
+
+
+https://msp.rivannoc.com/otrs/customer.pl
+sj@goodyear.com
+Pass
+
+
+
+Task2: NetworkAddress,HostAddres,IpAddress:
+10.0.0.5/8 = ip address: netA + Host Address
+172.16.1.5/16
+ netA = 17.16.0.0
+ Host = 1.5
+
+32i= 0,32,64,96,128,160,192
+
+192.168.1.129/27
+NetA = 192.168.1.127/27
+
+192.168.1.12/27 - 1.0
+192.168.1.41/27 - 1.32
+192.168.1.75/27 - 1.64
+192.168.1.100/27 - 1.96
+
+
+--------------------------
+1. Ping DIKIT
+2. Ping NOT DIKIT
+
+How to route: static,default,ospf,eigrp,bgp,vpntunneling
+
+CISCO
+LINUX
+WINDOWS
+
+Static Route:
+Pick a position - 
+R4 - static routing
+
+10.1.1.10
+
+@!R4
+
+config t
+ip route 10.1.1.4 255.255.255.252 10.1.1.9
+ip route 10.1.1.0 255.255.255.252 10.1.1.9
+
+
+@!R3
+config t
+ip route 10.1.1.0 255.255.255.252 10.1.1.5
+
+@!R2
+config t
+ip route 10.1.1.8 255.255.255.252 10.1.1.6
+
+@!R1
+config t
+ip route 10.1.1.4 255.255.255.252 10.1.1.2
+ip route 10.1.1.8 255.255.255.252 10.1.1.2
+
+--------------------------
+
+Troubleshooting 
+command - do tracer <IP Address>
+
+STATIC ROUTING FOR RUSSIAN IP ADDRESS:
+100.43.72.0/24
+
+1st HOP
+Cisco - 10.1.1.9
+Linux - 208.8.8.2
+Windows	- 10.3.3.1
+
+
+!@R4 
+Cisco: ip route 100.43.72.0 255.255.255.0 10.1.1.9
+
+Sample Results:
+
+R4(config)#do sh ip route static
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is not set
+
+      10.0.0.0/8 is variably subnetted, 8 subnets, 2 masks
+S        10.1.1.0/30 [1/0] via 10.1.1.9
+S        10.1.1.4/30 [1/0] via 10.1.1.9
+      100.0.0.0/24 is subnetted, 1 subnets
+S        100.43.72.0 [1/0] via 10.1.1.9
+
+
+LINUX: ip route add  100.43.72.0/24 via 208.8.8.2
+
+Sample results 
+[root@localhost ~]# netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         208.8.8.2       0.0.0.0         UG        0 0          0 ens160
+100.43.72.0     208.8.8.2       255.255.255.0   UG        0 0          0 ens160
+192.168.102.0   0.0.0.0         255.255.255.0   U         0 0          0 ens224
+208.8.8.0       0.0.0.0         255.255.255.0   U         0 0          0 ens160
+
+
+WINDOWS: route add 100.43.72.0 mask 255.255.255.0 10.3.3.1
+
+Sample Results
+route print | findstr 100.43.72
+
+C:\>route print | findstr 100.43.72
+      100.43.72.0    255.255.255.0         10.3.3.1       10.3.3.161    101
+	  
+--------------------------
+
+REMOVING THE STATIC ROUTE
+
+
+@!R4
+
+config t
+NO ip route 10.1.1.4 255.255.255.252 10.1.1.9
+NO ip route 10.1.1.0 255.255.255.252 10.1.1.9
+
+
+@!R3
+config t
+NO ip route 10.1.1.0 255.255.255.252 10.1.1.5
+
+@!R2
+config t
+NO ip route 10.1.1.8 255.255.255.252 10.1.1.6
+
+@!R1
+config t
+NO ip route 10.1.1.4 255.255.255.252 10.1.1.2
+NO ip route 10.1.1.8 255.255.255.252 10.1.1.2
+
+________________________
+
+Network Address = Network Prefix
+192.168.1.55/28 = .48
+192.168.1.105/28 = .96
+192.168.1.10/28 = .0
+192.168.1.70/28 = .64
+
+Dynamic Routing Protocol
+
+@R4:
+config t
+router OSPF 1
+router-id 4.4.4.4
+exit
+Int E3/3
+no shutdown
+ip add 208.8.8.100 255.255.255.0
+ip ospf 1 area 0
+exit
+router eigrp 100
+network 208.8.8.0 0.0.0.255
+end
+
+________________________________________________________________________
+
+Find the Kalye or Network Address:
+
+192.168.1.100/26 = 192.168.1.64
+EIGR:NETWORK 192.168.1.64 0.0.0.63
+OSPF: NETWORK 192.168.1.64 X.X.X.192 AREA 0
+BGP: NETWORK 192.168.1.64 MASK X.X.X.192
+
+
+192.168.1.205/27 = 192.168.1.192
+EIGR:NETWORK 192.168.1.192 0.0.0.31
+OSPF: NETWORK 192.168.1.192 X.X.X.224 AREA 0
+BGP: NETWORK 192.168.1.192 MASK X.X.X.224
+
+
+192.168.1.150/30 = 192.168.1.148
+EIGR:NETWORK 192.168.1.148 0.0.0.3
+OSPF: NETWORK 192.168.1.148 X.X.X.252 AREA 0
+BGP: NETWORK 192.168.1.148 MASK X.X.X.252
+
+
+192.168.1.131/28 = 192.168.1.128\
+
+________________________
+
+OSPF
+
+R2#sh ip ospf neighbor
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+1.1.1.1           0   FULL/DROTHER    00:00:34    10.1.1.1        Ethernet1/2
+3.3.3.3           1   FULL/DR         00:00:39    10.1.1.6        Ethernet1/1
+
+
+R3#sh ip ospf neighbor
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+4.4.4.4           0   FULL/  -        00:00:34    10.1.1.10       Ethernet1/2
+2.2.2.2           1   FULL/BDR        00:00:32    10.1.1.5        Ethernet1/1
+R3#
+
+OSPF HELLO PACKET 
+
+G
+Router ID
+AREA ID
+Subnet Mask
+Authentication Type
+
+Hello - 10 sec
+Dead - 40
+DR - Designation Router 
+BDR - Backup Designation Router 
+
+
+Parameter - EIGRP 
+Bad Realm
+BW
+Reliability
+Delay 
+Load
+MTU
+
+BGP 
+Analyzing Routing Table 
+
+AS1 - R1
+AS2 - PLDT 
+AS3 - Globe 
+AS45 - Google and Converge  
+
+Configuration Realworld POGO BGP
+
+!@R1
+
+config t
+router bgp 1
+bgp router-id 1.1.1.1
+bgp log-neighbor-changes
+neighbor 208.8.8.4 remote-as 45
+neighbor 207.7.7.2 remote-as 2
+neighbor 209.9.9.3 remote-as 3
+address-family ipv4
+neighbor 208.8.8.4 activate
+neighbor 207.7.7.2 activate
+neighbor 209.9.9.3 activate
+network 209.9.9.0 mask 255.255.255.0
+network 208.8.8.0 mask 255.255.255.0
+network 207.7.7.0 mask 255.255.255.0
+network 10.1.1.0 mask 255.255.255.252
+
+Sample results 
+
+
+sh ip bgp summary - old 
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+207.7.7.2       4            2       7       7       12    0    0 00:01:21        7
+208.8.8.4       4           45       6       7       12    0    0 00:01:40        5
+209.9.9.3       4            3       3       7       12    0    0 00:01:01        0
+
+sh ip bgp ipv4 unicast summary - new 
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+207.7.7.2       4            2       9       9       16    0    0 00:02:21       11
+208.8.8.4       4           45       9       9       16    0    0 00:02:41       12
+209.9.9.3       4            3      10       9       16    0    0 00:02:01       12
+
+sh ip bgp - show all results 
+
+traceroute 8.8.8.8
+Type escape sequence to abort.
+Tracing the route to dns.google.com (8.8.8.8)
+VRF info: (vrf in name/id, vrf out name/id)
+  1 core208e13.isp1convergeict.com (208.8.8.4) 0 msec 1 msec 0 msec
+  2 core45e01.google.com (45.4.5.5) [AS 45] 0 msec *  2 msec
+  
+  
+  
+________________________________________________________________________
+
